@@ -1,2 +1,2 @@
 # hello
-For training
+For github training
