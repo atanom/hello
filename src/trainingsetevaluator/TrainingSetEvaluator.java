@@ -14,13 +14,14 @@ import java.util.*;
 public class TrainingSetEvaluator 
 {
     File directory;
-    TreeSet<SynonymsCSVString> synonyms;
+//    TreeSet<SynonymsCSVString> synonyms;
     TreeMap<String, String> synonymSubCategories;
+    String onetCategory;
     
     public TrainingSetEvaluator(String pathname)
     {
         directory = new File(pathname);
-        synonyms = new TreeSet<SynonymsCSVString>();
+//        synonyms = new TreeSet<SynonymsCSVString>();
         synonymSubCategories = new TreeMap<String, String>();
     }
 
@@ -61,10 +62,14 @@ public class TrainingSetEvaluator
         InputFile in = new InputFile(directory, filespec);
         String stringRead = in.readLine(); // ignore header line
         stringRead = in.readLine();
+        int cntr = 1;
         while (stringRead != null)
         {
+            System.out.println("Sample " + ((Integer)cntr).toString());
             TrainingSetTSVString tSVString = new TrainingSetTSVString(stringRead);
+            tSVString.searchTitle(onetCategory, synonymSubCategories);
             stringRead = in.readLine();
+            cntr++;
         }
     }
     
@@ -73,10 +78,13 @@ public class TrainingSetEvaluator
         InputFile in = new InputFile(directory, filespec);
         String stringRead = in.readLine(); // ignore header line
         stringRead = in.readLine();
+        SynonymsCSVString cSVString = new SynonymsCSVString(stringRead);
+        //get onet category
+        onetCategory = cSVString.toString();
+        System.out.println("Onet category = " + onetCategory);
         while (stringRead != null)
         {
-            SynonymsCSVString cSVString = new SynonymsCSVString(stringRead);
-            synonyms.add(cSVString);
+//            synonyms.add(cSVString);
             String synonym = cSVString.nextSynonym();
             while (synonym != null)
             {
@@ -84,15 +92,19 @@ public class TrainingSetEvaluator
                 synonym = cSVString.nextSynonym();
             }
             stringRead = in.readLine();
+            if (stringRead != null)
+            {
+                cSVString = new SynonymsCSVString(stringRead);
+            }
         }
-        Set<String> synonymSet = synonymSubCategories.keySet();
-        Iterator<String> synonIterator = synonymSet.iterator();
-        while (synonIterator.hasNext())
-        {
-            String synonym = synonIterator.next();
-            String subCategory = synonymSubCategories.get(synonym);
-            System.out.println(synonym + ": " + subCategory);
-        }
-        TreeMap<String, String> synonymSubCategories;
+//        //The following output is to verify the synonym mappings are corrct and in alphabetical order
+//        Set<String> synonymSet = synonymSubCategories.keySet();
+//        Iterator<String> synonIterator = synonymSet.iterator();
+//        while (synonIterator.hasNext())
+//        {
+//            String synonym = synonIterator.next();
+//            String subCategory = synonymSubCategories.get(synonym);
+//            System.out.println(synonym + ": " + subCategory);
+//        }
     }
 }

@@ -39,15 +39,127 @@ public class TrainingSetTSVString extends TSVString
         return fields[fieldName.UTT.ordinal()];
     }
 
-    public void evaluate(TreeSet<SynonymsCSVString> synonyms)
+    public void searchTitle(String onetCategory, TreeMap<String, String> synonymSubCategories)
     {
-        Iterator<SynonymsCSVString> synonIterator = synonyms.iterator();
+        TreeMap<String, String> matches = new TreeMap<String, String>();
+        Set<String> synonymSet = synonymSubCategories.keySet();
+        Iterator<String> synonIterator = synonymSet.iterator();
         while (synonIterator.hasNext())
         {
-            SynonymsCSVString synonymString = synonIterator.next();
-
+            String synonym = synonIterator.next();
+            if (fields[fieldName.TITLE.ordinal()].contains(synonym))
+            {
+                String subCategory = synonymSubCategories.get(synonym);
+                matches.put(synonym, subCategory);
+            }
         }
-
+        displayMatches(onetCategory, matches);
+    }
+    
+    private void displayMatches(String onetCategory, TreeMap<String, String> matches)
+    {
+        switch (matches.size())
+        {
+            case 0:
+            {
+//                System.out.println("Unmatched: revert to onet category + " + onetCategory);
+//                System.out.println("Training Set UTT = " + fields[fieldName.UTT.ordinal()]);
+                break;
+                
+            }
+            case 1:
+            {
+                String synonym = matches.firstKey();
+                String subCategory = matches.get((synonym));
+                if (subCategory.equalsIgnoreCase(onetCategory))
+                {
+                    System.out.println("Synonym " + synonym + " maps to to onet category " + onetCategory);
+                    System.out.println("Training Set UTT = " + fields[fieldName.UTT.ordinal()]);
+                }
+                if (!(subCategory.equalsIgnoreCase(fields[fieldName.UTT.ordinal()])))
+                {
+                    System.out.println("\"Synonym " + synonym + " does not match training Set UTT");
+                    System.out.println("Training Set UTT = " + fields[fieldName.UTT.ordinal()]);
+                }
+                break;
+            }
+            case 2:
+            {
+                boolean oneOfTwoIsOnet = false;
+                Set<String> synonymSet = matches.keySet();
+                Iterator<String> synonIterator = synonymSet.iterator();
+                while (synonIterator.hasNext())
+                {
+                    String synonym = synonIterator.next();
+                    String subCategory = matches.get((synonym));
+                    if (subCategory.equalsIgnoreCase(onetCategory))
+                    {
+                        oneOfTwoIsOnet = true;
+                    }
+                }
+                if (oneOfTwoIsOnet)
+                {
+                    synonIterator = synonymSet.iterator();
+                    while (synonIterator.hasNext())
+                    {
+                        String synonym = synonIterator.next();
+                        String subCategory = matches.get((synonym));
+                        if (!subCategory.equalsIgnoreCase(onetCategory))
+                        {
+                            System.out.println("Synonym " + synonym + " maps to to UTT category " + subCategory);
+                            if (!(subCategory.equalsIgnoreCase(fields[fieldName.UTT.ordinal()])))
+                            {
+//                                System.out.println("Synonym " + synonym + " does not match training Set UTT");
+                                System.out.println("Training Set UTT = " + fields[fieldName.UTT.ordinal()]);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    System.out.println("Match ambiguity");
+                    synonIterator = synonymSet.iterator();
+                    while (synonIterator.hasNext())
+                    {
+                        String synonym = synonIterator.next();
+                        String subCategory = matches.get((synonym));
+                        System.out.println("Synonym " + synonym + " maps to to UTT category " + subCategory);
+                        if (!(subCategory.equalsIgnoreCase(fields[fieldName.UTT.ordinal()])))
+                        {
+                            System.out.println("\"Synonym " + synonym + " does not match training Set UTT");
+                            System.out.println("Training Set UTT = " + fields[fieldName.UTT.ordinal()]);
+                            if (!(subCategory.equalsIgnoreCase(fields[fieldName.UTT.ordinal()])))
+                            {
+                                System.out.println("\"Synonym " + synonym + " does not match training Set UTT");
+                                System.out.println("Training Set UTT = " + fields[fieldName.UTT.ordinal()]);
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+            default:
+            {
+                System.out.println("Match ambiguity");
+                Set<String> synonymSet = matches.keySet();
+                Iterator<String> synonIterator = synonymSet.iterator();
+                while (synonIterator.hasNext())
+                {
+                    String synonym = synonIterator.next();
+                    String subCategory = matches.get((synonym));
+                    if (subCategory.equalsIgnoreCase(onetCategory))
+                    {
+                        System.out.println("Synonym " + synonym + " maps to to onet category " + onetCategory);
+                        System.out.println("Training Set UTT = " + fields[fieldName.UTT.ordinal()]);
+                    }
+                    else
+                    {
+                        System.out.println("Synonym " + synonym + " maps to to UTT category " + subCategory);
+                        System.out.println("Training Set UTT = " + fields[fieldName.UTT.ordinal()]);
+                    }
+                }
+            }
+        }
     }
 
 }
